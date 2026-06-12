@@ -1,0 +1,18 @@
+[package]
+name = "md_5"
+version = "0.1.0"
+description = "Optimised MD5 (pure Rust, no_std)"
+keywords = ["md5", "md-5", "hash", "digest", "checksum"]
+categories = ["algorithms", "cryptography", "no-std"]
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[lib]
+name = "md_5"
+path = "src/lib.rs"
+
+[dev-dependencies]
+md-5 = "0.10"
