@@ -1,0 +1,21 @@
+[package]
+name = "sha_256"
+version = "1.0.1"
+description = "Optimised SHA-256 (pure Rust, no_std)"
+keywords = ["sha", "sha256", "sha-256", "hash", "digest"]
+categories = ["algorithms", "cryptography", "no-std"]
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[lib]
+name = "sha_256"
+path = "src/lib.rs"
+
+[badges]
+maintenance = { status = "passively-maintained" }
+
+[dev-dependencies]
+sha2 = "0.10.8"
