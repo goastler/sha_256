@@ -1,62 +1,93 @@
-# Sha_256
+# Hashes
 
-A fast implementation of sha-256 in rust.
+A Cargo workspace of fast, hand-optimized hashing algorithms in Rust, grown from
+the original `sha_256` crate. Every algorithm reuses the same performance recipe:
+`no_std`, stack-only fixed arrays (no heap), partially-unrolled message-schedule and
+compression loops, scratch-array reuse across calls, and direct big/little-endian
+byte conversions with no intermediate buffers.
 
-## Features
-- [x] Partially unrolled loops enhance efficiency by optimizing CPU cache utilization.
-- [x] Bypasses Rust's safety checks to eliminate array index safety validations.
-- [x] Utilizes only stack memory, avoiding dynamic memory allocation (`malloc`).
-- [x] Reduces memory footprint through array reuse across multiple SHA-256 stages.
-- [x] Prevents memory reallocation, allowing subsequent SHA-256 calls to reuse existing memory.
-- [x] Optimized memory layout increases CPU cache hit rates.
-- [x] Avoids unnecessary byte array conversions (e.g., u8a to u32a).
-- [x] Written entirely in Rust, with no embedded assembly or specific CPU instructions.
-- [x] No external dependencies.
-- [x] Does not require the standard library (`std`).
+## Crates
 
+### Portable tier — `no_std`, zero runtime dependencies
 
-## Installation
+| Crate | Algorithm | Output |
+|-------|-----------|--------|
+| [`sha_256`](crates/sha_256) | SHA-256 | 32 bytes |
+| [`sha_224`](crates/sha_224) | SHA-224 | 28 bytes |
+| [`sha_512`](crates/sha_512) | SHA-512 | 64 bytes |
+| [`sha_384`](crates/sha_384) | SHA-384 | 48 bytes |
+| [`sha_512_256`](crates/sha_512_256) | SHA-512/256 | 32 bytes |
+| [`sha_512_224`](crates/sha_512_224) | SHA-512/224 | 28 bytes |
+| [`sha_1`](crates/sha_1) | SHA-1 *(legacy/broken)* | 20 bytes |
+| [`md_5`](crates/md_5) | MD5 *(legacy/broken)* | 16 bytes |
+| [`sha_3`](crates/sha_3) | SHA3-224/256/384/512 | 28/32/48/64 bytes |
+| [`blake3_portable`](crates/blake3) | BLAKE3 | 32 bytes |
 
-In your project, run:
-```bash
-cargo add sha_256
-```
+### Speed tier — `std`, runtime CPU detection + portable fallback
+
+| Crate | Acceleration |
+|-------|--------------|
+| [`sha_256_ni`](crates/sha_256_ni) | Intel SHA-NI |
+| [`sha_224_ni`](crates/sha_224_ni) | Intel SHA-NI |
+| [`sha_1_ni`](crates/sha_1_ni) | Intel SHA-NI |
+| [`blake3_simd`](crates/blake3_simd) | SSE4.1 vectorized compression |
+
+See [`docs/ACCELERATION.md`](docs/ACCELERATION.md) for the portable-vs-speed strategy,
+the hardware-support matrix, and documented future work (BLAKE3 AVX2 `hash_many`,
+SHA-512 extension, ARM acceleration).
 
 ## Usage
 
-Import the library
-```rust
-use sha_256::Sha256;
-```
-
-Create an instance of the sha256 struct.
+Every crate exposes the same "bytes in, bytes out" API:
 
 ```rust
-let mut sha256: Sha256 = Sha256::new();
+use sha_512::Sha512;
+
+let mut hasher = Sha512::new();
+let digest: [u8; 64] = hasher.digest(b"hello");
 ```
 
-Create your message in bytes.
+SHA-3 exposes one type per output size; speed crates are drop-in replacements:
+
 ```rust
-let bytes = &[0u8, 1u8, 2u8];
+let mut h = sha_3::Sha3_256::new();
+let digest: [u8; 32] = h.digest(b"hello");
+
+// Uses SHA-NI when the CPU supports it, else falls back to the portable crate.
+let mut h = sha_256_ni::Sha256::new();
+let digest: [u8; 32] = h.digest(b"hello");
 ```
 
-Run sha256 to create a digest/hash.
-```rust
-let hash: [u8; 32] = sha256.digest(bytes);
+See the [example project](example/) for converting strings/hex to and from bytes.
+
+## Correctness
+
+Each crate is fuzz-tested against the corresponding established crate
+(`sha2` / `sha1` / `md-5` / `sha3` / `blake3`) over every input length across the
+padding boundaries plus random multi-block inputs, alongside canonical known-answer
+vectors. Speed crates additionally cross-check against their portable sibling.
+
+```bash
+cargo test --workspace --lib
 ```
 
-The general idea is "bytes in, bytes out". This is the most efficient input and output type to minimise conversions.
+## Benchmarks
 
-You will need to convert your input into bytes, e.g. string to bytes. See [example project](/example/).
+The [`benchmarks`](crates/benchmarks) crate (Criterion) compares every crate against
+RustCrypto, [`ring`](https://crates.io/crates/ring), and `openssl` (the latter two
+using hardware crypto where available), sweeping input sizes from 16 B to 1 MiB.
 
-If you want the hash as a hex string you will need to convert it from bytes to hex afterwards. See [example project](/example/).
+```bash
+cargo bench -p benchmarks
+```
 
-## Benchmark
-How fast is this library? Up to **25%** faster than the [`sha256`](https://crates.io/crates/sha256) and [`sha`](https://crates.io/crates/sha). They contain use of Intel's `SHA-NI` cpu instructions (via a feature flag), whereas this library uses pure rust.
+Requires a system OpenSSL for the `openssl` baseline. For the most representative
+numbers, build with an optimized native profile, e.g.:
 
-**However**, the above figures were obtained through some rough benchmarks on only my hardware. More thorough benchmarks are required, YMMV!
+```bash
+RUSTFLAGS="-C target-cpu=native" cargo bench -p benchmarks
+```
 
-// TODO further benchmarks
+## License
 
-## Links
-- [crates.io](https://crates.io/crates/sha_256)
+Apache-2.0.

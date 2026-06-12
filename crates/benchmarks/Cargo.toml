@@ -1,0 +1,40 @@
+[package]
+name = "benchmarks"
+version = "0.0.0"
+publish = false
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+# Our crates under test.
+[dependencies]
+sha_256 = { path = "../sha_256" }
+sha_224 = { path = "../sha_224" }
+sha_512 = { path = "../sha_512" }
+sha_384 = { path = "../sha_384" }
+sha_512_256 = { path = "../sha_512_256" }
+sha_512_224 = { path = "../sha_512_224" }
+sha_1 = { path = "../sha_1" }
+md_5 = { path = "../md_5" }
+sha_3 = { path = "../sha_3" }
+blake3_portable = { path = "../blake3" }
+sha_256_ni = { path = "../sha_256_ni" }
+sha_224_ni = { path = "../sha_224_ni" }
+sha_1_ni = { path = "../sha_1_ni" }
+blake3_simd = { path = "../blake3_simd" }
+
+# Comparison baselines + the benchmark framework.
+[dev-dependencies]
+criterion = "0.5"
+digest = "0.10"
+sha2 = "0.10"
+sha1 = "0.10"
+md-5 = "0.10"
+sha3 = "0.10"
+blake3 = "1"
+ring = "0.17"
+openssl = "0.10"
+
+[[bench]]
+name = "hashes"
+harness = false
