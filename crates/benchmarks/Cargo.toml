@@ -22,10 +22,7 @@ sha_256_ni = { path = "../sha_256_ni" }
 sha_224_ni = { path = "../sha_224_ni" }
 sha_1_ni = { path = "../sha_1_ni" }
 blake3_simd = { path = "../blake3_simd" }
-
-# Comparison baselines + the benchmark framework.
-[dev-dependencies]
-criterion = "0.5"
+# Comparison baselines (also used by the custom convergence runner binary).
 digest = "0.10"
 sha2 = "0.10"
 sha1 = "0.10"
@@ -35,6 +32,14 @@ blake3 = "1"
 ring = "0.17"
 openssl = "0.10"
 
+[dev-dependencies]
+criterion = "0.5"
+
 [[bench]]
 name = "hashes"
 harness = false
+
+# Custom multi-run convergence harness (mean + stdev across repeated runs).
+[[bin]]
+name = "convergence"
+path = "src/bin/convergence.rs"

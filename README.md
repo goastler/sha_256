@@ -81,12 +81,22 @@ using hardware crypto where available), sweeping input sizes from 16 B to 1 MiB.
 cargo bench -p benchmarks
 ```
 
-Requires a system OpenSSL for the `openssl` baseline. For the most representative
-numbers, build with an optimized native profile, e.g.:
+There is also a custom **convergence harness** that interleaves all contenders per
+round and averages over repeated runs until the speedup estimates (mean ± stdev)
+stabilise — fairer than one-at-a-time timing on a CPU whose frequency drifts:
 
 ```bash
-RUSTFLAGS="-C target-cpu=native" cargo bench -p benchmarks
+RUSTFLAGS="-C target-cpu=native" taskset -c 3 \
+  cargo run --release --bin convergence -p benchmarks
 ```
+
+Requires a system OpenSSL for the `openssl` baseline.
+
+**Measured results and analysis: [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md).**
+Headlines on an i7-1185G7: the SHA-NI crates match/beat RustCrypto and `ring` on
+SHA-1/256/224; portable SHA-3 is ~12% faster than RustCrypto; MD5 is on par;
+portable SHA-512 trails RustCrypto by ~20%; and BLAKE3 SSE4.1 beats our scalar but
+is ~8× behind the official crate's multi-chunk AVX2 on large inputs (by design).
 
 ## License
 
