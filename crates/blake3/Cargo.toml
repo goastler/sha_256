@@ -1,0 +1,18 @@
+[package]
+name = "blake3_portable"
+version = "0.1.0"
+description = "Portable BLAKE3 (pure Rust, no_std, no SIMD)"
+keywords = ["blake3", "hash", "digest", "checksum"]
+categories = ["algorithms", "cryptography", "no-std"]
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[lib]
+name = "blake3_portable"
+path = "src/lib.rs"
+
+[dev-dependencies]
+blake3 = "1"
