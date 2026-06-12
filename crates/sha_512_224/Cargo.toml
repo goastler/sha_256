@@ -1,0 +1,18 @@
+[package]
+name = "sha_512_224"
+version = "0.1.0"
+description = "Optimised SHA-512/224 (pure Rust, no_std)"
+keywords = ["sha", "sha512", "sha-512-224", "hash", "digest"]
+categories = ["algorithms", "cryptography", "no-std"]
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[lib]
+name = "sha_512_224"
+path = "src/lib.rs"
+
+[dev-dependencies]
+sha2 = "0.10.8"

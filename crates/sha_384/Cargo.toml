@@ -1,0 +1,18 @@
+[package]
+name = "sha_384"
+version = "0.1.0"
+description = "Optimised SHA-384 (pure Rust, no_std)"
+keywords = ["sha", "sha384", "sha-384", "hash", "digest"]
+categories = ["algorithms", "cryptography", "no-std"]
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[lib]
+name = "sha_384"
+path = "src/lib.rs"
+
+[dev-dependencies]
+sha2 = "0.10.8"
