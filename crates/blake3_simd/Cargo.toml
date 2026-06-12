@@ -1,0 +1,21 @@
+[package]
+name = "blake3_simd"
+version = "0.1.0"
+description = "SIMD-accelerated BLAKE3 (SSE4.1, runtime-detected), pure Rust"
+keywords = ["blake3", "simd", "sse41", "hash", "digest"]
+categories = ["algorithms", "cryptography", "hardware-support"]
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[lib]
+name = "blake3_simd"
+path = "src/lib.rs"
+
+[dependencies]
+blake3_portable = { path = "../blake3" }
+
+[dev-dependencies]
+blake3 = "1"
