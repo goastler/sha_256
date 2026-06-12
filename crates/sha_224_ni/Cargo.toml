@@ -1,0 +1,22 @@
+[package]
+name = "sha_224_ni"
+version = "0.1.0"
+description = "SHA-224 accelerated with Intel SHA-NI (runtime-detected), pure Rust"
+keywords = ["sha", "sha224", "sha-ni", "hash", "simd"]
+categories = ["algorithms", "cryptography", "hardware-support"]
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[lib]
+name = "sha_224_ni"
+path = "src/lib.rs"
+
+[dependencies]
+sha_224 = { path = "../sha_224" }
+sha_256_ni = { path = "../sha_256_ni" }
+
+[dev-dependencies]
+sha2 = "0.10.8"

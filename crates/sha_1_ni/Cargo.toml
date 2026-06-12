@@ -1,0 +1,21 @@
+[package]
+name = "sha_1_ni"
+version = "0.1.0"
+description = "SHA-1 accelerated with Intel SHA-NI (runtime-detected), pure Rust"
+keywords = ["sha", "sha1", "sha-ni", "hash", "simd"]
+categories = ["algorithms", "cryptography", "hardware-support"]
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[lib]
+name = "sha_1_ni"
+path = "src/lib.rs"
+
+[dependencies]
+sha_1 = { path = "../sha_1" }
+
+[dev-dependencies]
+sha1 = "0.10"
