@@ -1,0 +1,18 @@
+[package]
+name = "sha_3"
+version = "0.1.0"
+description = "Optimised SHA-3 (Keccak) — SHA3-224/256/384/512, pure Rust, no_std"
+keywords = ["sha3", "sha-3", "keccak", "hash", "digest"]
+categories = ["algorithms", "cryptography", "no-std"]
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[lib]
+name = "sha_3"
+path = "src/lib.rs"
+
+[dev-dependencies]
+sha3 = "0.10"
