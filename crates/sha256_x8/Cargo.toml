@@ -1,0 +1,18 @@
+[package]
+name = "sha256_x8"
+version = "0.0.0"
+publish = false
+description = "Experimental 8-way AVX2 batched SHA-256 (8 messages in parallel)"
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[lib]
+name = "sha256_x8"
+path = "src/lib.rs"
+
+[dependencies]
+sha_256 = { path = "../sha_256" }
+
+[dev-dependencies]
+sha2 = "0.10.8"
