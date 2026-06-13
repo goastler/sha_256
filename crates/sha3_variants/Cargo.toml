@@ -1,0 +1,15 @@
+[package]
+name = "sha3_variants"
+version = "0.0.0"
+publish = false
+description = "Experimental optimised Keccak/SHA3-256 (fully-unrolled permutation)"
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[lib]
+name = "sha3_variants"
+path = "src/lib.rs"
+
+[dev-dependencies]
+sha3 = "0.10"

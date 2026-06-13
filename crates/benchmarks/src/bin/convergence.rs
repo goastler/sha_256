@@ -95,6 +95,12 @@ struct Cell {
 }
 
 fn run_group(out: &mut String, name: &str, baseline: &str, mut contenders: Vec<(&str, Hasher)>) {
+    // Optional group filter: BENCH_FILTER=substring runs only matching groups.
+    if let Ok(f) = std::env::var("BENCH_FILTER") {
+        if !f.is_empty() && !name.contains(f.as_str()) {
+            return;
+        }
+    }
     eprintln!("== {} ==", name);
     let n = contenders.len();
     let base_idx = contenders
@@ -351,6 +357,43 @@ fn main() {
         ours!(v, "ours_simd", blake3_simd::Blake3::new());
         v.push(("official_blake3", Box::new(|d: &[u8]| { black_box(blake3::hash(black_box(d))); })));
         run_group(&mut out, "blake3", "official_blake3", v);
+    }
+
+    // SHA-256 optimisation-variant study (baseline = our shipped sha_256 crate).
+    {
+        let mut v: Vec<(&str, Hasher)> = Vec::new();
+        ours!(v, "current_sha_256", sha_256::Sha256::new());
+        ours!(v, "A_naive", sha256_variants::Sha256Naive::new());
+        ours!(v, "B_unroll8_rotating", sha256_variants::Sha256Unroll8Rotating::new());
+        ours!(v, "C_unroll8_renamed", sha256_variants::Sha256Unroll8Renamed::new());
+        ours!(v, "D_renamed_kw", sha256_variants::Sha256RenamedKw::new());
+        ours!(v, "F_renamed_unchecked", sha256_variants::Sha256RenamedUnchecked::new());
+        ours!(v, "G_renamed_kw_unchecked", sha256_variants::Sha256RenamedKwUnchecked::new());
+        rc!(v, "rustcrypto_sha_ni", sha2::Sha256);
+        run_group(&mut out, "sha256_variants", "current_sha_256", v);
+    }
+
+    // SHA-512 optimisation study: can the scalar tricks beat the scalar libraries?
+    {
+        let mut v: Vec<(&str, Hasher)> = Vec::new();
+        ours!(v, "current_sha_512", sha_512::Sha512::new());
+        ours!(v, "opt_kw_unchecked", sha512_variants::Sha512Opt::new());
+        rc!(v, "rustcrypto", sha2::Sha512);
+        ring_c!(v, &ring::digest::SHA512);
+        v.push(("openssl", Box::new(|d: &[u8]| { black_box(openssl::sha::sha512(black_box(d))); })));
+        run_group(&mut out, "sha512_variants", "rustcrypto", v);
+    }
+
+    // SHA-3 optimisation study: fully-unrolled Keccak vs current, RustCrypto, OpenSSL.
+    {
+        let mut v: Vec<(&str, Hasher)> = Vec::new();
+        ours!(v, "current_sha_3", sha_3::Sha3_256::new());
+        ours!(v, "opt_unrolled", sha3_variants::Sha3_256Opt::new());
+        rc!(v, "rustcrypto", sha3::Sha3_256);
+        v.push(("openssl", Box::new(|d: &[u8]| {
+            black_box(openssl::hash::hash(openssl::hash::MessageDigest::sha3_256(), black_box(d)).unwrap());
+        })));
+        run_group(&mut out, "sha3_variants", "current_sha_3", v);
     }
 
     println!("{}", out);
